@@ -1,54 +1,52 @@
-//Create variables here
-var gameState=0, readState;
-var dog,happydog,database,foodS,foodStoke;
-var dogimg, happydog;
-var feed, addFood;
-var fedTime, lastFed,foodObj ;
 
-
-function preload()
-{
   
-  dogimg = loadImage("images/dogImg.png");
-  happyDog = loadImage("images/dogImg1.png");
-  garden = loadImage("virtual pet images/Garden.png")
-  washroom = loadImage("virtual pet images/Wash Room.png")
-    bedroom = loadImage("virtual pet images/Bed Room.png")
-    sadDog = loadImage("virtual pet images/deadDog.png")
+  var dog,sadDog,happyDog,garden,washroom, database;
+var foodS,foodStock;
+var fedTime,lastFed,currentTime;
+var feed,addFood;
+var foodObj;
+var gameState,readState;
+
+function preload(){
+sadDog=loadImage("Images/Dog.png");
+happyDog=loadImage("Images/happy dog.png");
+garden=loadImage("Images/Garden.png");
+washroom=loadImage("Images/Wash Room.png");
+bedroom=loadImage("Images/Bed Room.png");
 }
 
 function setup() {
-  createCanvas(500, 500);
+  database=firebase.database();
+  createCanvas(400,500);
+  
   foodObj = new Food();
-  dog = createSprite(250,250);
-  dog.addImage(dogimg);
-  dog.scale = 0.2
 
+  foodStock=database.ref('Food');
+  foodStock.on("value",readStock);
 
+  fedTime=database.ref('FeedTime');
+  fedTime.on("value",function(data){
+    lastFed=data.val();
+  });
 
-  database = firebase.database();
-  foodStock = database.ref("food");
-  foodStock.on("value", readStock);
-
+  //read game state from database
+  readState=database.ref('gameState');
+  readState.on("value",function(data){
+    gameState=data.val();
+  });
+   
+  dog=createSprite(200,400,150,150);
+  dog.addImage(sadDog);
+  dog.scale=0.15;
   
-//read game state from database
-readState=database.ref('gameState');
-readState.on("value",function(data){
-  gameState=data.val();
-});
-  
-  feed = createButton("feed the dog");
-  feed.position(500, 95);
+  feed=createButton("Feed the dog");
+  feed.position(700,95);
   feed.mousePressed(feedDog);
 
-  addFood = createButton("Add food");
-  addFood.position(700, 95);
+  addFood=createButton("Add Food");
+  addFood.position(800,95);
   addFood.mousePressed(addFoods);
-  
-  
-
 }
-
 
 function draw() {
   currentTime=hour();
